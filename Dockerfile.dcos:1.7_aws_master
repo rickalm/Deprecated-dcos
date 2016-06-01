@@ -1,0 +1,4 @@
+FROM rickalm/dcos:1.7_base
+ENV ROLES=master:aws-master:aws
+ADD files /
+RUN /setup.sh
