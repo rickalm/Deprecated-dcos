@@ -1,4 +1,4 @@
-FROM rickalm/centos7:base-dev
+FROM rickalm/centos7:base
 
 # Bootstrap DCOS into image
 # Done as seperate step to improve docker build cache

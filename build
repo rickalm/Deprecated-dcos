@@ -30,6 +30,7 @@ fi
 
 # Build our base containers
 #
+<<<<<<< HEAD
 sed -i Dockerfile.dcos:1.7_base -e "s~FROM .*~FROM rickalm/centos7:base-${rev}~"
 docker build ${build_opts} -f Dockerfile.dcos:1.7_base -t rickalm/dcos:1.7_base-${rev} . || exit 1
 
@@ -39,11 +40,29 @@ sed -i Dockerfile.dcos:1.7_aws_master -e "s~FROM .*~FROM rickalm/dcos:1.7_base-$
 sed -i Dockerfile.dcos:1.7_aws_slave -e "s~FROM .*~FROM rickalm/dcos:1.7_base-${rev}~"
 docker build ${build_opts} -f Dockerfile.dcos:1.7_aws_master -t rickalm/dcos:1.7_aws_master${tag} . || exit 1
 docker build ${build_opts} -f Dockerfile.dcos:1.7_aws_slave -t rickalm/dcos:1.7_aws_slave${tag} . || exit 1
+=======
+cp Dockerfile.dcos:1.7_base MyDocker
+sed -i MyDocker -e "s~FROM .*~FROM rickalm/centos7:base-${rev}~" &&
+docker build ${build_opts} -f MyDocker -t rickalm/dcos:1.7_base-${rev} . || exit 1
+rm MyDocker
+
+# Build the Master/Slave containers based on base
+#
+cp Dockerfile.dcos:1.7_aws_master MyDocker
+sed -i MyDocker -e "s~FROM .*~FROM rickalm/dcos:1.7_base-${rev}~" &&
+docker build ${build_opts} -f MyDocker -t rickalm/dcos:1.7_aws_master-${rev} . || exit 1
+rm MyDocker
+
+cp Dockerfile.dcos:1.7_aws_slave MyDocker
+sed -i MyDocker -e "s~FROM .*~FROM rickalm/dcos:1.7_base-${rev}~" &&
+docker build ${build_opts} -f MyDocker -t rickalm/dcos:1.7_aws_slave-${rev} . || exit 1
+rm MyDocker
+>>>>>>> e1d0ab419a993b58b5487b58d617e4a6b30ab3cd
 
 # If we are pushing, then do so
 #
-[ -n "${opt_push}" ] && docker push rickalm/dcos:1.7_aws_master${tag} || exit 1
-[ -n "${opt_push}" ] && docker push rickalm/dcos:1.7_aws_slave${tag} || exit 1
+[ -n "${opt_push}" ] && docker push rickalm/dcos:1.7_aws_master-${rev} || exit 1
+[ -n "${opt_push}" ] && docker push rickalm/dcos:1.7_aws_slave-${rev} || exit 1
 
 # Clean up our left over images (e.g. tagged <none>) to free disk space
 #

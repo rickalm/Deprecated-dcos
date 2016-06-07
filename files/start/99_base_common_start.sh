@@ -1,13 +1,15 @@
 # Create /data directories for any symlinked targets
 #
-mkdir -p /data/var/log/mesos 2>/dev/null
-mkdir -p /data/var/log/mesosphere 2>/dev/null
+find / -type l -lname '/data*' 2>/dev/null | grep -v '^/proc' | while read link; do mkdir -p $(readlink $link); done
 
-mkdir -p /data/var/lib/mesos 2>/dev/null
-mkdir -p /data/var/lib/mesosphere 2>/dev/null
-mkdir -p /data/var/lib/dcos 2>/dev/null
-mkdir -p /data/var/lib/zookeeper 2>/dev/null
-mkdir -p /data/var/lib/cosmos 2>/dev/null
+#mkdir -p /data/var/log/mesos 2>/dev/null
+#mkdir -p /data/var/log/mesosphere 2>/dev/null
+
+#mkdir -p /data/var/lib/mesos 2>/dev/null
+#mkdir -p /data/var/lib/mesosphere 2>/dev/null
+#mkdir -p /data/var/lib/dcos 2>/dev/null
+#mkdir -p /data/var/lib/zookeeper 2>/dev/null
+#mkdir -p /data/var/lib/cosmos 2>/dev/null
 
 # Save Mesos Cluster Name
 #

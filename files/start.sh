@@ -21,7 +21,7 @@ dcos_conf=${dcos_dir}/etc/dcos-docker.env
 #
 rm /start.loader 2>/dev/null
 touch /start.loader
-find /setup/ -name *_start.sh | sort | while read line; do
+find /start/ -name *_start.sh | sort | while read line; do
   echo echo Running. $line >>/start.loader
   echo . $line >>/start.loader
 done
