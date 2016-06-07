@@ -24,19 +24,19 @@ fi
 
 # Pull/Build the Centos containers, in a subdirectory because its tied to another git repo
 #
-if [ -d centos7 ]; then
+if [ -d centos7 -a -f centos7/build.sh ]; then
   pushd centos7; bash build.sh ${rev}; popd
 fi
 
 # Build our base containers
 #
-sed -i Dockerfile.dcos:1.7_base -e "s~FROM .*~FROM rickalm/centos7:base-${rev}~" &&
+sed -i Dockerfile.dcos:1.7_base -e "s~FROM .*~FROM rickalm/centos7:base-${rev}~"
 docker build ${build_opts} -f Dockerfile.dcos:1.7_base -t rickalm/dcos:1.7_base-${rev} . || exit 1
 
 # Build the Master/Slave containers based on base
 #
-sed -i Dockerfile.dcos:1.7_aws_master -e "s~FROM .*~FROM rickalm/dcos:1.7_base-${rev}~" &&
-sed -i Dockerfile.dcos:1.7_aws_slave -e "s~FROM .*~FROM rickalm/dcos:1.7_base-${rev}~" &&
+sed -i Dockerfile.dcos:1.7_aws_master -e "s~FROM .*~FROM rickalm/dcos:1.7_base-${rev}~"
+sed -i Dockerfile.dcos:1.7_aws_slave -e "s~FROM .*~FROM rickalm/dcos:1.7_base-${rev}~"
 docker build ${build_opts} -f Dockerfile.dcos:1.7_aws_master -t rickalm/dcos:1.7_aws_master${tag} . || exit 1
 docker build ${build_opts} -f Dockerfile.dcos:1.7_aws_slave -t rickalm/dcos:1.7_aws_slave${tag} . || exit 1
 
