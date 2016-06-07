@@ -17,8 +17,8 @@ done
 # Stop any processes running that look like they are ours, unless we are told not to 'nokill'
 #
 if [ -n "${opt_kill}" ]; then
-  docker ps | grep rickalm.dcos | awk '{print $1}' | xargs -n 1 docker rm
-  docker ps | grep rickalm.centos | awk '{print $1}' | xargs -n 1 docker rm
+  docker ps | grep uptake.dcos | awk '{print $1}' | xargs -n 1 docker rm
+  docker ps | grep uptake.centos | awk '{print $1}' | xargs -n 1 docker rm
   docker ps -a -q | xargs docker rm
 fi
 
@@ -31,26 +31,26 @@ fi
 # Build our base containers
 #
 cp Dockerfile.dcos:1.7_base MyDocker
-sed -i MyDocker -e "s~FROM .*~FROM rickalm/centos7:base-${rev}~"
-docker build ${build_opts} -f MyDocker -t rickalm/dcos:1.7_base-${rev} . || exit 1
+sed -i MyDocker -e "s~FROM .*~FROM uptake/centos7:base-${rev}~"
+docker build ${build_opts} -f MyDocker -t uptake/dcos:1.7_base-${rev} . || exit 1
 rm MyDocker
 
 # Build the Master/Slave containers based on base
 #
 cp Dockerfile.dcos:1.7_aws_master MyDocker
-sed -i MyDocker -e "s~FROM .*~FROM rickalm/dcos:1.7_base-${rev}~"
-docker build ${build_opts} -f MyDocker -t rickalm/dcos:1.7_aws_master-${rev} . || exit 1
+sed -i MyDocker -e "s~FROM .*~FROM uptake/dcos:1.7_base-${rev}~"
+docker build ${build_opts} -f MyDocker -t uptake/dcos:1.7_aws_master-${rev} . || exit 1
 rm MyDocker
 
 cp Dockerfile.dcos:1.7_aws_slave MyDocker
-sed -i MyDocker -e "s~FROM .*~FROM rickalm/dcos:1.7_base-${rev}~"
-docker build ${build_opts} -f MyDocker -t rickalm/dcos:1.7_aws_slave-${rev} . || exit 1
+sed -i MyDocker -e "s~FROM .*~FROM uptake/dcos:1.7_base-${rev}~"
+docker build ${build_opts} -f MyDocker -t uptake/dcos:1.7_aws_slave-${rev} . || exit 1
 rm MyDocker
 
 # If we are pushing, then do so
 #
-[ -n "${opt_push}" ] && docker push rickalm/dcos:1.7_aws_master-${rev} || exit 1
-[ -n "${opt_push}" ] && docker push rickalm/dcos:1.7_aws_slave-${rev} || exit 1
+[ -n "${opt_push}" ] && docker push uptake/dcos:1.7_aws_master-${rev} || exit 1
+[ -n "${opt_push}" ] && docker push uptake/dcos:1.7_aws_slave-${rev} || exit 1
 
 # Clean up our left over images (e.g. tagged <none>) to free disk space
 #
