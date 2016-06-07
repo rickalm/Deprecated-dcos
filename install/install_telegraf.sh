@@ -1,13 +1,16 @@
 # Install Telegraf tools
 #
 
+RELEASE=0.13.0
+
 # Fetch tools and make sure they exist
 #
-curl -o - https://dl.influxdata.com/telegraf/releases/telegraf-0.13.0_linux_amd64.tar.gz | tar -C /tmp -xzf - \
+curl -o - https://dl.influxdata.com/telegraf/releases/telegraf-${RELEASE}_linux_amd64.tar.gz | tar -C /tmp -xzf - \
   || exit 1
 
-test -x /tmp/telegraf-0.13.0-1/usr/bin/telegraf \
+test -x /tmp/telegraf-*/usr/bin/telegraf \
   || exit 1
+
 
 # Create telegraf user and provide access to docker sock
 #
@@ -15,27 +18,19 @@ useradd -G docker telegraf \
   || exit 1
 
 
-# create directories needed
-#
-install -d /etc/telegraf/telegraf.d \
-  || exit 1
-
 # Change to the source directory
 #
-pushd /tmp/telegraf-0.13.0-1 2>&1 >/dev/null
+pushd /tmp/telegraf-* 2>&1 >/dev/null
 
 # Install required files
 #
-install -D etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf \
-  || exit 1
-
 install -D etc/logrotate.d/telegraf /etc/logrotate.d/telegraf \
   || exit 1
 
-install -D usr/bin/telegraf /usr/bin/telegraf \
+install -m 555 -D usr/bin/telegraf /usr/bin/telegraf \
   || exit 1
 
-install -D usr/lib/telegraf/scripts/telegraf.service /usr/lib/telegraf/scripts/telegraf.service \
+install -m 644 -D usr/lib/telegraf/scripts/telegraf.service /usr/lib/telegraf/scripts/telegraf.service \
   || exit 1
 
 
