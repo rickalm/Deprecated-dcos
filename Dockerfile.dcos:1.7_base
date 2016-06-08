@@ -5,7 +5,26 @@ FROM rickalm/centos7:base
 #
 ADD install/install_dcos.sh /install/
 
+# Install all DCOS components and Yum Repos as a single Layer
+#
 RUN \
+  yum -y update \
+    || exit 1; \
+  \
+  # Install other tools we will need; \
+  \
+  yum -y install \
+    less \
+    ipset \
+    iptables \
+    unzip \
+    || exit 1; \
+  \
+  # Cleanup YUM files to reduce image size; \
+  \
+  yum -y clean all \
+    || exit 1; \
+  \
   bash /install/install_dcos.sh \
     || exit 1; \
   \

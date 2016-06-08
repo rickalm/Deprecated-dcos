@@ -17,8 +17,8 @@ done
 # Stop any processes running that look like they are ours, unless we are told not to 'nokill'
 #
 if [ -n "${opt_kill}" ]; then
+  docker ps | grep rickalm.centos | awk '{print $1}' | xargs -n 1 docker rm
   docker ps | grep uptake.dcos | awk '{print $1}' | xargs -n 1 docker rm
-  docker ps | grep uptake.centos | awk '{print $1}' | xargs -n 1 docker rm
   docker ps -a -q | xargs docker rm
 fi
 
@@ -31,7 +31,7 @@ fi
 # Build our base containers
 #
 cp Dockerfile.dcos:1.7_base MyDocker
-sed -i MyDocker -e "s~FROM .*~FROM uptake/centos7:base-${rev}~"
+sed -i MyDocker -e "s~FROM .*~FROM rickalm/centos7:base-${rev}~"
 docker build ${build_opts} -f MyDocker -t uptake/dcos:1.7_base-${rev} . || exit 1
 rm MyDocker
 

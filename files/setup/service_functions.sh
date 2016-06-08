@@ -20,8 +20,13 @@ add_to_unit() {
 append_to_unit() {
   local key=$1
   local value=$2
-
   sed -i -e "/\\[Unit\\]/a${key}=${value}" ${unit_filename}
+}
+
+append_to_service() {
+  local key=$1
+  local value=$2
+  sed -i -e "/\\[Service\\]/a${key}=${value}" ${unit_filename}
 }
 
 svc(){

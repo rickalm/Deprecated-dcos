@@ -12,7 +12,9 @@ svc_sed Pre=/ Pre=-/
 svc dcos-gen-resolvconf.service
 svc_rm_line spartan                                   # Remove Dependency on starting Spartan
 
-#svc dcos-mesos-slave.service
+svc dcos-mesos-slave.service
+append_to_service KillSignal SIGUSR1
+
 #svc_waitfor_leader                                    # Needs to talk to leader.mesos, rather then dying wait for it
 #svc_needs dcos-vol-discovery-priv-agent.service       # Needs the mesos-resources file to be created
 #svc_wants dcos-spartan.service                        # Start Spartan if not running already (Hybrid Master/Slave Node)
