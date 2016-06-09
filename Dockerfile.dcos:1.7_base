@@ -15,6 +15,14 @@ RUN \
   \
   yum -y install \
     less \
+    iotop \
+    dstat \
+    strace \
+    nmap \
+    telnet \
+    traceroute \
+    net-tools \
+    bind-utils \
     ipset \
     iptables \
     unzip \
