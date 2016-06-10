@@ -1,0 +1,46 @@
+# Disable any services not needed for being the DNS server for the outside world
+#
+
+systemctl disable dcos-adminrouter-reload.service
+systemctl disable dcos-adminrouter-reload.timer
+systemctl disable dcos-adminrouter.service
+systemctl disable dcos-cluster-id.service
+systemctl disable dcos-cosmos.service
+systemctl disable dcos-ddt.service
+systemctl disable dcos-epmd.service
+systemctl disable dcos-exhibitor.service
+systemctl disable dcos-gen-resolvconf.service
+systemctl disable dcos-gen-resolvconf.timer
+systemctl disable dcos-history-service.service
+systemctl disable dcos-keepalived.service
+systemctl disable dcos-logrotate.service
+systemctl disable dcos-logrotate.timer
+systemctl disable dcos-marathon.service
+systemctl disable dcos-mesos-master.service
+systemctl disable dcos-oauth.service
+systemctl disable dcos-signal.timer
+systemctl disable dcos-spartan-watchdog.service
+systemctl disable dcos-spartan-watchdog.timer
+systemctl disable dcos-spartan.service
+systemctl disable dcos-signal.service
+
+cluster_name=$(curl -sSL http://${EXHIBITOR_ADDRESS}/mesos/master/state | jq .cluster | tr -d '"')
+dns_port=53
+[ "${EXHIBITOR_ADDRESS}" == "127.0.0.1" ] && dns_port=153
+
+cat <<EOF >/opt/mesosphere/etc/mesos-dns.json
+{
+  "zk": "zk://${EXHIBITOR_ADDRESS}:2181/mesos",
+  "refreshSeconds": 30,
+  "ttl": 60,
+  "domain": "mesos.${cluster_name}.${SEARCH}",
+  "port": ${dns_port},
+  "resolvers": ["169.254.169.253"],
+  "externalon": true,
+  "httpon": false,
+  "timeout": 5,
+  "listener": "0.0.0.0",
+  "email": "root.mesos-dns.mesos",
+  "IPSources": ["host", "netinfo"]
+}
+EOF

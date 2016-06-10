@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# vim: set ft=sh:
+
+flavors="master slave dns"
+
+for flavor in ${flavors}; do
+  docker tag uptake/dcos:1.7_aws_${flavor}-${1} uptake/dcos:1.7_aws_${flavor}-${2} || exit 1
+  docker push uptake/dcos:1.7_aws_${flavor}-${2} || exit 1
+done
