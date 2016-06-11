@@ -1,12 +1,24 @@
-FROM rickalm/centos7:base
+FROM rickalm/centos7:base-007
 
 # Bootstrap DCOS into image
 # Done as seperate step to improve docker build cache
 #
 ADD install/install_dcos.sh /install/
+RUN \
+  bash /install/install_dcos.sh \
+    || exit 1; \
+  \
+  # Cleanup after ourselves; \
+  \
+  rm -rf /install \
+    || exit 1; \
+  \
+  /bin/true
 
-# Install all DCOS components and Yum Repos as a single Layer
+# Update Yum Repos and other tools as a single Layer
+# Install Rexray and Telegraf
 #
+ADD install/* /install/
 RUN \
   yum -y update \
     || exit 1; \
@@ -33,22 +45,8 @@ RUN \
   yum -y clean all \
     || exit 1; \
   \
-  bash /install/install_dcos.sh \
-    || exit 1; \
+  # Install Rexray and Telegraf; \
   \
-  # Cleanup after ourselves; \
-  \
-  rm -rf /install \
-    || exit 1; \
-  \
-  /bin/true
-
-
-# Install 3rd party packages into the image
-#
-ADD install/* /install/
-
-RUN \
   bash /install/install_rexray.sh \
     || exit 1; \
   \

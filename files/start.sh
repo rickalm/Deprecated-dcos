@@ -32,7 +32,6 @@ rm /start.loader
 
 # If the start_dind script is in place then call it telling it to return back to us
 #
-set -x
 [ -f /start_dind.sh ] && exec /start_dind.sh $0 return_from_exec $@
 
 

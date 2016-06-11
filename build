@@ -22,21 +22,11 @@ if [ -n "${opt_kill}" ]; then
   docker ps -a -q | xargs docker rm
 fi
 
-# Pull/Build the Centos containers, in a subdirectory because its tied to another git repo
-#
-if [ -d centos7 -a -f centos7/build.sh ]; then
-  pushd centos7; bash build.sh ${rev}; popd
-fi
-
 # Build our base containers
 #
-cp Dockerfile.dcos:1.7_base MyDocker
-sed -e "s~FROM .*~FROM rickalm/centos7:base-${rev}~" -i . MyDocker
-docker build ${build_opts} -f MyDocker -t uptake/dcos:1.7_base-${rev} . || exit 1
-rm MyDocker*
+docker build ${build_opts} -f Dockerfile.dcos:1.7_base -t uptake/dcos:1.7_base-${rev} . || exit 1
 
 flavors="master slave dns"
-
 for flavor in ${flavors}; do
   # Build the Master/Slave containers based on base
   #

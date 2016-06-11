@@ -26,11 +26,16 @@ systemctl disable dcos-signal.service
 
 # If we cant talk to the mesos master, then abort
 #
-cluster_name=$(curl -sSL http://${EXHIBITOR_ADDRESS}/mesos/master/state | jq .cluster | tr -d '"')
-[ -z "${cluster_name}" ] && echo Warning cannot figure out cluster name
-DCOS_DNS_SUBDOMAIN=${DCOS_DNS_SUBDOMAIN:mesos.${cluster_name}.${SEARCH}}
+if [ -z "${DCOS_DNS_SUBDOMAIN}" ]; then
+  cluster_name=$(curl -sSL http://${EXHIBITOR_ADDRESS}/mesos/master/state | jq .cluster | tr -d '"')
+  if [ -z "${cluster_name}" ]; then
+    echo Warning cannot figure out cluster name and DCOS_DNS_SUBDOMAIN not specified, aborting start
+    exit 1
+  fi
+  DCOS_DNS_SUBDOMAIN=mesos.${cluster_name}.${SEARCH}
+fi
 
-echo My Domain is ${DCOS_DNS_SUBDOMAIN}
+echo My DNS Domain is ${DCOS_DNS_SUBDOMAIN}
 
 # Use port 53, unless we are on a All-in-One cluster
 #
