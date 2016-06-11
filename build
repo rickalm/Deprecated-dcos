@@ -31,26 +31,28 @@ fi
 # Build our base containers
 #
 cp Dockerfile.dcos:1.7_base MyDocker
-sed -i MyDocker -e "s~FROM .*~FROM rickalm/centos7:base-${rev}~"
+sed -e "s~FROM .*~FROM rickalm/centos7:base-${rev}~" -i . MyDocker
 docker build ${build_opts} -f MyDocker -t uptake/dcos:1.7_base-${rev} . || exit 1
-rm MyDocker
+rm MyDocker*
 
-# Build the Master/Slave containers based on base
-#
-cp Dockerfile.dcos:1.7_aws_master MyDocker
-sed -i MyDocker -e "s~FROM .*~FROM uptake/dcos:1.7_base-${rev}~"
-docker build ${build_opts} -f MyDocker -t uptake/dcos:1.7_aws_master-${rev} . || exit 1
-rm MyDocker
+flavors="master slave dns"
 
-cp Dockerfile.dcos:1.7_aws_slave MyDocker
-sed -i MyDocker -e "s~FROM .*~FROM uptake/dcos:1.7_base-${rev}~"
-docker build ${build_opts} -f MyDocker -t uptake/dcos:1.7_aws_slave-${rev} . || exit 1
-rm MyDocker
+for flavor in ${flavors}; do
+  # Build the Master/Slave containers based on base
+  #
+  cp Dockerfile.dcos:1.7_aws_${flavor} MyDocker
+  sed -e "s~FROM .*~FROM uptake/dcos:1.7_base-${rev}~" -i . MyDocker
+  docker build ${build_opts} -f MyDocker -t uptake/dcos:1.7_aws_${flavor}-${rev} . || exit 1
+  rm MyDocker*
+done
 
 # If we are pushing, then do so
 #
-[ -n "${opt_push}" ] && docker push uptake/dcos:1.7_aws_master-${rev} || exit 1
-[ -n "${opt_push}" ] && docker push uptake/dcos:1.7_aws_slave-${rev} || exit 1
+if [ -n "${opt_push}" ]; then
+  for flavor in ${flavors}; do
+    docker push uptake/dcos:1.7_aws_${flavor}-${rev} || exit 1
+  done
+fi
 
 # Clean up our left over images (e.g. tagged <none>) to free disk space
 #

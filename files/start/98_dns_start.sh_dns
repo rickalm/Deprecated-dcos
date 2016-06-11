@@ -24,23 +24,41 @@ systemctl disable dcos-spartan-watchdog.timer
 systemctl disable dcos-spartan.service
 systemctl disable dcos-signal.service
 
+# If we cant talk to the mesos master, then abort
+#
 cluster_name=$(curl -sSL http://${EXHIBITOR_ADDRESS}/mesos/master/state | jq .cluster | tr -d '"')
+[ -z "${cluster_name}" ] && echo Warning cannot figure out cluster name
+DCOS_DNS_SUBDOMAIN=${DCOS_DNS_SUBDOMAIN:mesos.${cluster_name}.${SEARCH}}
+
+echo My Domain is ${DCOS_DNS_SUBDOMAIN}
+
+# Use port 53, unless we are on a All-in-One cluster
+#
 dns_port=53
 [ "${EXHIBITOR_ADDRESS}" == "127.0.0.1" ] && dns_port=153
 
+# Re-write the mesos-dns.json file based on the new info
+#
 cat <<EOF >/opt/mesosphere/etc/mesos-dns.json
 {
   "zk": "zk://${EXHIBITOR_ADDRESS}:2181/mesos",
-  "refreshSeconds": 30,
-  "ttl": 60,
-  "domain": "mesos.${cluster_name}.${SEARCH}",
-  "port": ${dns_port},
-  "resolvers": ["169.254.169.253"],
-  "externalon": true,
-  "httpon": false,
-  "timeout": 5,
+  "domain": "mesos.${DCOS_DNS_SUBDOMAIN}",
+  "stateTimeoutSeconds": 30,
+  "IPSources": [ "netinfo", "mesos", "host" ],
   "listener": "0.0.0.0",
-  "email": "root.mesos-dns.mesos",
-  "IPSources": ["host", "netinfo"]
+  "port": ${dns_port},
+  "dnson": true,
+  "httpon": false,
+  "ttl": 30,
+  "refreshSeconds": 15,
+  "resolvers": ["169.254.169.253"],
+  "timeout": 1,
+  "externalon": false,
+  "SOAMname": "ns1.mesos.${DCOS_DNS_SUBDOMAIN}",
+  "SOARname": "root.ns1.mesos.${DCOS_DNS_SUBDOMAIN}",
+  "SOARefresh": 60,
+  "SOARetry": 600,
+  "SOAExpire": 86400,
+  "SOAMinttl": 60
 }
 EOF
