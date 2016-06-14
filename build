@@ -6,18 +6,19 @@
 for opt in $@; do
   case ${opt} in
     kill) opt_kill=true;;
-    nocache) build_opts="${build_opts} -no-cache";;
     push) opt_push=true;;
+    nocache) build_opts="${build_opts} -no-cache";;
     *) tag=_${opt};rev=${opt};;
   esac
 done
 
+# If no tag specified, use dev
+#
 [ -z "${tag}" ] && tag=_dev && rev=dev
 
 # Stop any processes running that look like they are ours, unless we are told not to 'nokill'
 #
 if [ -n "${opt_kill}" ]; then
-  docker ps | grep rickalm.centos | awk '{print $1}' | xargs -n 1 docker rm
   docker ps | grep uptake.dcos | awk '{print $1}' | xargs -n 1 docker rm
   docker ps -a -q | xargs docker rm
 fi

@@ -19,5 +19,5 @@ MESOS_CLUSTER_SIZE=${MESOS_CLUSTER_SIZE:-1}
 
 # If DNS vars were not defined, get the info from the /etc/resolv.conf file passed to us by docker
 #
-RESOLVERS=${RESOLVERS:-$(grep ^nameserver /etc/resolv.conf | awk '{print $2}' | tr ' ' ',')}
+RESOLVERS=${RESOLVERS:-$(grep ^nameserver /etc/resolv.conf | awk '{print $2}' | tr '\n ' ',,' | sed -e 's/,$//')}
 SEARCH=${SEARCH:-$(grep ^search /etc/resolv.conf | awk '{print $2}')}

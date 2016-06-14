@@ -26,6 +26,10 @@ RUN \
   # Install other tools we will need; \
   \
   yum -y install \
+    epel-release \
+    || exit 1; \
+  \
+  yum -y install \
     less \
     iotop \
     dstat \
@@ -38,6 +42,7 @@ RUN \
     ipset \
     iptables \
     unzip \
+    xmlstarlet \
     || exit 1; \
   \
   # Cleanup YUM files to reduce image size; \
