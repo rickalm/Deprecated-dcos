@@ -49,7 +49,7 @@ cat <<EOF >/opt/mesosphere/etc/mesos-dns.json
   "zk": "zk://${EXHIBITOR_ADDRESS}:2181/mesos",
   "domain": "mesos.${DCOS_DNS_SUBDOMAIN}",
   "stateTimeoutSeconds": 30,
-  "IPSources": [ "netinfo", "mesos", "host" ],
+  "IPSources": [ "host" ],
   "listener": "0.0.0.0",
   "port": ${dns_port},
   "dnson": true,
